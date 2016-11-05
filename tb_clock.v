@@ -29,14 +29,15 @@ module tb_clock;
 	reg rst;
 
 	// Outputs
-	wire clk_1hz, clk_fast;
+	wire clk_1hz, clk_fast, clk_blink;
 
 	// Instantiate the Unit Under Test (UUT)
 	clock uut (
 		.clk(clk), 
 		.rst(rst), 
 		.clk_1hz(clk_1hz),
-        .clk_fast(clk_fast)
+      .clk_fast(clk_fast),
+		.clk_blink(clk_blink)
 	);
 
 	initial begin
