@@ -1,1 +1,1 @@
--intstyle "ise" -incremental -lib "unisims_ver" -lib "unimacro_ver" -lib "xilinxcorelib_ver" -lib "secureip" -o "/home/michael/Documents/random-projects/stopwatch/tb_clock_isim_beh.exe" -prj "/home/michael/Documents/random-projects/stopwatch/tb_clock_beh.prj" "work.tb_clock" "work.glbl" 
+-intstyle "ise" -incremental -lib "unisims_ver" -lib "unimacro_ver" -lib "xilinxcorelib_ver" -lib "secureip" -o "/home/michael/Documents/random-projects/stopwatch/master_tb_isim_beh.exe" -prj "/home/michael/Documents/random-projects/stopwatch/master_tb_beh.prj" "work.master_tb" "work.glbl" 

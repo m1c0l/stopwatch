@@ -5,8 +5,5 @@
      behavior or data corruption.  It is strongly advised that
      users do not edit the contents of this file. -->
 <messages>
-<msg type="warning" file="HDLCompiler" num="1016" delta="unknown" >"/home/michael/Documents/random-projects/stopwatch/tb_clock.v" Line 35: Port <arg fmt="%s" index="1">clk_2hz</arg> is not connected to this instance
-</msg>
-
 </messages>
 

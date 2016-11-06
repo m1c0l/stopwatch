@@ -31,6 +31,8 @@ module tb_counter;
     reg minutes_bot_digit;
     reg seconds_top_digit;
     reg seconds_bot_digit;
+	 reg is_minute_increasing,
+	 is_second_increasing;
 
 	// Instantiate the Unit Under Test (UUT)
 	counter uut (
@@ -39,7 +41,9 @@ module tb_counter;
         .minutes_top_digit(minutes_top_digit),
         .minutes_bot_digit(minutes_bot_digit),
         .seconds_top_digit(seconds_top_digit),
-        .seconds_bot_digit(seconds_bot_digit)
+        .seconds_bot_digit(seconds_bot_digit),
+		  .is_minute_increasing(is_minute_increasing),
+		  .is_second_increasing(is_second_increasing)
 	);
 
 	initial begin

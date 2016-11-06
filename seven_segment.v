@@ -19,11 +19,12 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module seven_segment(
-        input minute_top_digit,
-        input minute_bot_digit,
-        input second_top_digit,
-        input second_bot_digit,
-        input [3:0] an,
+        //input minute_top_digit,
+        //input minute_bot_digit,
+        //input second_top_digit,
+        //input second_bot_digit,
+		  digit,
+        //input [3:0] an,
         //is_blinking,
         //clk_blink,
         seg
@@ -35,12 +36,12 @@ module seven_segment(
     reg [7:0] segment_array = 0;
     
     always @(*) begin
-        case (an)
+        /*case (an)
             'b1: digit = second_bot_digit;
             'b10: digit = second_top_digit;
             'b100: digit = minute_bot_digit;
             'b1000: digit = minute_top_digit;
-        endcase
+        endcase*/
         // 8'bDP_CG_CF_CE_CD_CC_CB_CA
         case (digit)
             'd0: segment_array = 8'b1100_0000;
@@ -54,6 +55,7 @@ module seven_segment(
             'd8: segment_array = 8'b1000_0000;
             'd9: segment_array = 8'b1001_0000;
         endcase
-        seg = segment_array;
+        
     end
+	 assign seg = segment_array;
 endmodule

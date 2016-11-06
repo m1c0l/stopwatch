@@ -20,21 +20,20 @@
 //////////////////////////////////////////////////////////////////////////////////
 module controller(
     input clk,
-    //input clk_1hz, input clk_2hz, 
-    //input clk_fast, input clk_blink,
+    input clk_1hz, input clk_2hz, 
+    input clk_fast, input clk_blink,
     input sel, input adj,
-    input pause, input reset,
-    output an, output is_blinking, //output clk_blink_out,
-    output is_min_increasing, output is_sec_increasing,
-    output clk_control_counter
+    input pause, input rst
+    //output an, 
+	 //output is_blinking, //output clk_blink_out,
+    //output is_min_increasing, output is_sec_increasing
+    //output clk_control_counter
     );
     
     wire clk_1hz, clk_2hz, 
     clk_fast, clk_blink;
     
-    clock clock1(.clk(clk), .rst(reset), 
-        .clk_1hz(clk_1hz), .clk_2hz(clk_2hz), .clk_fast(clk_fast),
-        .clk_blink(clk_blink));
+    
     
     always @(*) begin
         clk_control_counter = clk_1hz;
@@ -47,16 +46,16 @@ module controller(
         else if (adj == 1) begin
             if (sel == 0) begin
                 //is_min_increasing = 1;
-                is_sec_increasing = 0;
+                //is_sec_increasing = 0;
             end
             else begin
-                is_min_increasing = 0;
+                //is_min_increasing = 0;
                 //is_sec_increasing = 1;
             end
-            clk_control_counter = clk_2hz;
+            //clk_control_counter = clk_2hz;
         end
         
-        an = 1;
+        //an = 1;
     end
     
 endmodule
