@@ -49,10 +49,10 @@ module counter(
     //clock clock1(.clk(clk), .rst(rst), 
     //    .clk_1hz(clk_1hz), .clk_2hz(clk_2hz), .clk_fast(clk_fast),
     //    .clk_blink(clk_blink));
-	 //minutes_top_digit = 0;
-	 //minutes_bot_digit = 0;
-	 //seconds_top_digit = 0;
-	 //seconds_bot_digit = 0;
+	 initial minutes_top_digit <= 0;
+	 initial minutes_bot_digit <= 0;
+	 initial seconds_top_digit <= 0;
+	 initial seconds_bot_digit <= 0;
     
     always @ (posedge clk_fast) begin
         if (rst) begin
@@ -77,7 +77,7 @@ module counter(
             minutes_top_digit <= minutes_top_digit + 1;
         end
         if (minutes_top_digit == 'd10) begin
-            minutes_top_digit = 0;
+            minutes_top_digit <= 0;
         end
         
     end

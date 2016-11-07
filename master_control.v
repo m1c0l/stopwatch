@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////
 module master_control(
     input clk, input sw, input rst,
-	 output reg [7:0] seg,
-	 output reg [3:0] an
+	 output wire [7:0] seg,
+	 output wire [3:0] an
     );
 	 
 	 
@@ -33,10 +33,10 @@ module master_control(
         .clk_1hz(clk_1hz), .clk_2hz(clk_2hz), .clk_fast(clk_fast),
         .clk_blink(clk_blink));
 		  
-	 wire [3:0] minutes_top = 0;
-	 wire [3:0] minutes_bot = 0;
-	 wire [3:0] seconds_top = 0;
-	 wire [3:0] seconds_bot = 0;
+	 wire [3:0] minutes_top;
+	 wire [3:0] minutes_bot;
+	 wire [3:0] seconds_top;
+	 wire [3:0] seconds_bot;
 	 counter counter1(.clk_1hz(clk_1hz), .clk_2hz(clk_2hz),
 		.clk_fast(clk_fast),
 		.rst(rst),
@@ -50,12 +50,17 @@ module master_control(
 	 wire [7:0] seg_min_bot;
 	 wire [7:0] seg_sec_top;
 	 wire [7:0] seg_sec_bot;
+	 wire [7:0] seg_out;
+	 wire [3:0] an_out;
 	 seven_segment seg_min1(minutes_top, seg_min_top);
 	 seven_segment seg_min0(minutes_bot, seg_min_bot);
 	 seven_segment seg_sec1(seconds_top, seg_sec_top);
 	 seven_segment seg_sec0(seconds_bot, seg_sec_bot);
-		  
-	 //controller control(.clk(clk), .clk_1hz(clk_1hz), .clk_2hz(clk_2hz),
-		//.clk_fast(clk_fast), .clk_blink(clk_blink)
+	 display display1(.clk_fast(clk_fast), .clk_blink(clk_blink),
+		.adj(adj), .sel(sel), .seg_min_top(seg_min_top), .seg_min_bot(seg_min_bot),
+		.seg_sec_top(seg_sec_top), .seg_sec_bot(seg_sec_bot),
+		.seg_out(seg_out), .an(an_out));
+	 assign seg = seg_out;
+	 assign an = an_out;
 
 endmodule

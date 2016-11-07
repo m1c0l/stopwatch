@@ -25,8 +25,8 @@
 module tb_counter;
 
 	// Inputs
-	reg clk;
-	reg rst;
+	reg clk_1hz, clk_2hz, clk_fast;
+	reg rst, sel, adj, pause;
     reg minutes_top_digit;
     reg minutes_bot_digit;
     reg seconds_top_digit;
@@ -36,20 +36,26 @@ module tb_counter;
 
 	// Instantiate the Unit Under Test (UUT)
 	counter uut (
-		.clk(clk), 
+		//.clk(clk), 
+		.clk_1hz(clk_1hz),
+		.clk_2hz(clk_2hz),
+		.clk_fast(clk_fast),
 		.rst(rst),
+		.pause(pause),
+		.sel(sel),
+		.adj(adj),
         .minutes_top_digit(minutes_top_digit),
         .minutes_bot_digit(minutes_bot_digit),
         .seconds_top_digit(seconds_top_digit),
-        .seconds_bot_digit(seconds_bot_digit),
-		  .is_minute_increasing(is_minute_increasing),
-		  .is_second_increasing(is_second_increasing)
+        .seconds_bot_digit(seconds_bot_digit)//,
+		  //.is_minute_increasing(is_minute_increasing),
+		  //.is_second_increasing(is_second_increasing)
 	);
 
 	initial begin
 		// Initialize Inputs
-		clk = 0;
-		rst = 1;
+		clk_fast = 0;
+		rst = 0;
 
 		// Wait 100 ns for global reset to finish
 		#100;
@@ -59,7 +65,7 @@ module tb_counter;
             #10;
             rst = 0;
             
-            clk = ~clk;
+            clk_fast = ~clk_fast;
         end
 	end
       
