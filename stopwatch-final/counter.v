@@ -23,6 +23,7 @@ module counter(
     input clk_1hz,
 	 input clk_2hz,
 	 input clk_fast,
+     input clk_1min,
     input rst,
 	 input pause,
 	 input adj,
@@ -41,113 +42,111 @@ module counter(
 	 initial seconds_bot_digit <= 0;
      reg is_running = 0;
      reg is_fwd_or_bkwd = 1; // 1 = forward, 0 = backward
+     reg [1:0] cnt_units = 1; // 0 = milliseconds, 1 = sec/min, 2 = min/hours
+     reg [26:0] cnt_jstk = 'd25_000_000;
      
-     reg clk_used;
+     reg ms_clk_used;
+     reg hm_clk_used;
+     
+     //reg clk_rst = 0;
+     
+     reg is_mins_secs = 1;
+     wire[3:0] ms_min_top;
+     wire[3:0] ms_min_bot;
+     wire[3:0] ms_sec_top;
+     wire[3:0] ms_sec_bot;
+     
+     counter_hms counter_mins_secs(.clk_used(ms_clk_used), .rst(rst), .sel(sel), .adj(adj),
+        .is_running(is_mins_secs), .is_fwd_or_bkwd(is_fwd_or_bkwd),
+        .minutes_top_digit(ms_min_top), .minutes_bot_digit(ms_min_bot),
+        .seconds_top_digit(ms_sec_top), .seconds_bot_digit(ms_sec_bot));
+        
+     reg is_hours_mins = 0;
+     wire[3:0] hm_min_top;
+     wire[3:0] hm_min_bot;
+     wire[3:0] hm_sec_top;
+     wire[3:0] hm_sec_bot;
+     counter_hms counter_hours_mins(.clk_used(hm_clk_used), .rst(rst), .sel(sel), .adj(adj),
+        .is_running(is_hours_mins), .is_fwd_or_bkwd(is_fwd_or_bkwd),
+        .minutes_top_digit(hm_min_top), .minutes_bot_digit(hm_min_bot),
+        .seconds_top_digit(hm_sec_top), .seconds_bot_digit(hm_sec_bot));
      
      always @(posedge clk) begin
         
         if (adj == 1) begin
-            clk_used <= clk_2hz;
+            ms_clk_used <= clk_2hz;
+            hm_clk_used <= clk_2hz;
         end
         else begin
-            clk_used <= clk_1hz;
+            ms_clk_used <= clk_1hz;
+            hm_clk_used <= clk_1min;
         end
         if (pause) begin
             is_running <= ~is_running;
         end
-        else if (jstkPosX >= 'd900) begin
+        else if (jstkPosX >= 'd800) begin
             //adj = 1;
             //clk_used = clk_2hz;
             //minutes_top_digit <= 'd9;
             is_running <= 1;
-            is_fwd_or_bkwd <= 1;
-        end
-        else if (jstkPosX <= 'd150) begin
-            is_running <= 1;
             is_fwd_or_bkwd <= 0;
         end
+        else if (jstkPosX <= 'd200) begin
+            is_running <= 1;
+            is_fwd_or_bkwd <= 1;
+        end
+        // new stuffs below
+        if (jstkPosY >= 'd800 && cnt_units != 0) begin
+            if (cnt_jstk != 0)
+                cnt_jstk <= cnt_jstk - 1;
+            
+        end
+        else if (jstkPosY <= 'd200 && cnt_units != 'd2) begin
+            if (cnt_jstk != 'd50_000_000)
+                cnt_jstk <= cnt_jstk + 1;
+            /*if (!adj && cnt_units == 1) begin
+                clk_used <= clk_1min;
+            end*/
+            //cnt_units <= cnt_units + 1;
+            //clk_rst <= 1;
+        end
+        
+        if (cnt_jstk < 'd12_500_000) begin
+            cnt_units <= 0;
+        end
+        else if (cnt_jstk > 'd37_500_000) begin
+            cnt_units <= 2;
+        end
+        else begin
+            cnt_units <= 1;
+        end
+        // milliseconds
+        if (cnt_units == 0) begin
+            is_mins_secs <= 0;
+            is_hours_mins <= 0;
+            minutes_top_digit <= 9;
+            minutes_bot_digit <= 9;
+            seconds_top_digit <= 2;
+            seconds_bot_digit <= 2;
+        end
+        // mins/secs
+        if (cnt_units == 1) begin
+            is_mins_secs <= 1;
+            is_hours_mins <= 0;
+            minutes_top_digit <= ms_min_top;
+            minutes_bot_digit <= ms_min_bot;
+            seconds_top_digit <= ms_sec_top;
+            seconds_bot_digit <= ms_sec_bot;
+        end
+        // hours/mins
+        if (cnt_units == 2) begin
+            is_mins_secs <= 0;
+            is_hours_mins <= 1;
+            minutes_top_digit <= hm_min_top;
+            minutes_bot_digit <= hm_min_bot;
+            seconds_top_digit <= hm_sec_top;
+            seconds_bot_digit <= hm_sec_bot;
+        end
       end
-     
-     /*always @() begin
-        
-     end*/
-    
-    always @ (posedge clk_used) begin
-        if (rst) begin
-            minutes_top_digit <= 0;
-            minutes_bot_digit <= 0;
-            seconds_top_digit <= 0;
-            seconds_bot_digit <= 0;
-        end
-        else if (is_running && is_fwd_or_bkwd) begin
-        // if running and counting forward
-            if (adj == 0 || (adj == 1 && sel == 1)) begin
-            // seconds control
-                seconds_bot_digit <= seconds_bot_digit + 1;
-                // if we reach 9 seconds
-                if (seconds_bot_digit == 'd9) begin
-                    seconds_bot_digit <= 0;
-                    seconds_top_digit <= seconds_top_digit + 1;
-                end
-                // if we reach 59 seconds
-                if (seconds_top_digit == 'd5 && seconds_bot_digit == 'd9) begin
-                    seconds_top_digit <= 0;
-                    minutes_bot_digit <= minutes_bot_digit + 1;
-                end
-            end
-            
-            // if adjust = 1, always increase minutes
-            if (adj == 1 && sel == 0) begin
-                minutes_bot_digit <= minutes_bot_digit + 1;
-            end
-            if (adj == 0 || (adj == 1 && sel == 0)) begin
-            // if at 9 minutes
-                if (minutes_bot_digit == 'd9) begin
-                    minutes_bot_digit <= 0;
-                    minutes_top_digit <= minutes_top_digit + 1;
-                end
-                if (minutes_top_digit == 'd9 && minutes_bot_digit == 'd9) begin
-                    minutes_top_digit <= 0;
-                end
-            end
-        end
-        
-        else if (is_running && !is_fwd_or_bkwd) begin
-        // if running and counting backward
-            if (adj == 0 || (adj == 1 && sel == 1)) begin
-                seconds_bot_digit <= seconds_bot_digit - 1;
-                if (seconds_bot_digit == 'd0) begin
-                    seconds_bot_digit <= 9;
-                    seconds_top_digit <= seconds_top_digit - 1;
-                end
-                if (seconds_top_digit == 'd0 && seconds_bot_digit == 'd0) begin
-                    seconds_top_digit <= 5;
-                    seconds_bot_digit <= 9;
-                    if (minutes_bot_digit) begin
-                        minutes_bot_digit <= minutes_bot_digit - 1;
-                    end
-                    else begin
-                        minutes_top_digit <= minutes_top_digit - 1;
-                        minutes_bot_digit <= 0;
-                    end
-                end
-            end
-            
-            if (adj == 1 && sel == 0) begin
-                minutes_bot_digit <= minutes_bot_digit + 1;
-            end
-            if (adj == 0 || (adj == 1 && sel == 0)) begin
-                if (minutes_bot_digit == 'd9) begin
-                    minutes_bot_digit <= 0;
-                    minutes_top_digit <= minutes_top_digit + 1;
-                end
-                if (minutes_top_digit == 'd9 && minutes_bot_digit == 'd9) begin
-                    minutes_top_digit <= 0;
-                end
-            end
-        end
-        
-        
-    end
 
 endmodule
