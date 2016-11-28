@@ -95,12 +95,12 @@ module master_control(
     
 	 
      wire pause_state, rst_state;
-	 wire clk_1hz, clk_2hz, clk_fast, clk_blink, clk_1min;
+	 wire clk_1hz, clk_2hz, clk_fast, clk_blink, clk_1min, clk_1ms;
      
 	 
 	 clock clock1(.clk(clk),
         .clk_1hz(clk_1hz), .clk_2hz(clk_2hz), .clk_fast(clk_fast),
-        .clk_blink(clk_blink), .clk_1min(clk_1min));
+        .clk_blink(clk_blink), .clk_1min(clk_1min), .clk_1ms(clk_1ms));
         
     debouncer rst_deb(.btn(rst), .clk(clk), .btn_state(rst_state));
     debouncer pause_deb(.btn(pause), .clk(clk), .btn_state(pause_state));

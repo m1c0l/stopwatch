@@ -24,6 +24,7 @@ module counter(
 	 input clk_2hz,
 	 input clk_fast,
      input clk_1min,
+	  input clk_1ms,
     input rst,
 	 input pause,
 	 input adj,
@@ -45,11 +46,12 @@ module counter(
      reg [1:0] cnt_units = 1; // 0 = milliseconds, 1 = sec/min, 2 = min/hours
      reg [26:0] cnt_jstk = 'd25_000_000;
      
-     reg ms_clk_used;
-     reg hm_clk_used;
+     
+     
      
      //reg clk_rst = 0;
      
+	  reg ms_clk_used;
      reg is_mins_secs = 1;
      wire[3:0] ms_min_top;
      wire[3:0] ms_min_bot;
@@ -61,7 +63,8 @@ module counter(
         .minutes_top_digit(ms_min_top), .minutes_bot_digit(ms_min_bot),
         .seconds_top_digit(ms_sec_top), .seconds_bot_digit(ms_sec_bot));
         
-     reg is_hours_mins = 0;
+     reg hm_clk_used;
+	  reg is_hours_mins = 0;
      wire[3:0] hm_min_top;
      wire[3:0] hm_min_bot;
      wire[3:0] hm_sec_top;
@@ -71,15 +74,28 @@ module counter(
         .minutes_top_digit(hm_min_top), .minutes_bot_digit(hm_min_bot),
         .seconds_top_digit(hm_sec_top), .seconds_bot_digit(hm_sec_bot));
      
+	  reg milli_clk_used;
+	  reg is_milli = 0;
+     wire[3:0] milli_digit4;
+     wire[3:0] milli_digit3;
+     wire[3:0] milli_digit2;
+     wire[3:0] milli_digit1;
+     counter_milli counter_milliseconds(.clk_used(hm_clk_used), .rst(rst), .sel(sel), .adj(adj),
+        .is_running(is_hours_mins), .is_fwd_or_bkwd(is_fwd_or_bkwd),
+        .digit4(milli_digit4), .digit3(milli_digit3),
+		  .digit2(milli_digit2), .digit1(milli_digit1));
+		  
      always @(posedge clk) begin
         
         if (adj == 1) begin
             ms_clk_used <= clk_2hz;
             hm_clk_used <= clk_2hz;
+				milli_clk_used <= clk_2hz;
         end
         else begin
             ms_clk_used <= clk_1hz;
             hm_clk_used <= clk_1min;
+				milli_clk_used <= clk_1ms;
         end
         if (pause) begin
             is_running <= ~is_running;
@@ -124,10 +140,10 @@ module counter(
         if (cnt_units == 0) begin
             is_mins_secs <= 0;
             is_hours_mins <= 0;
-            minutes_top_digit <= 9;
-            minutes_bot_digit <= 9;
-            seconds_top_digit <= 2;
-            seconds_bot_digit <= 2;
+            minutes_top_digit <= milli_digit1;
+            minutes_bot_digit <= milli_digit2;
+            seconds_top_digit <= milli_digit3;
+            seconds_bot_digit <= milli_digit4;
         end
         // mins/secs
         if (cnt_units == 1) begin

@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2016-11-23T15:54:41</DateModified>
+  <DateModified>2016-11-28T02:04:24</DateModified>
   <ModuleName>master_control</ModuleName>
   <SummaryTimeStamp>2016-11-23T15:52:33</SummaryTimeStamp>
-  <SavedFilePath>C:/Users/152/Documents/stopwatch-final/iseconfig/master_control.xreport</SavedFilePath>
-  <ImplementationReportsDirectory>C:/Users/152/Documents/stopwatch-final\</ImplementationReportsDirectory>
+  <SavedFilePath>C:/Users/michael/Documents/GitHub/stopwatch/stopwatch-final/iseconfig/master_control.xreport</SavedFilePath>
+  <ImplementationReportsDirectory>C:/Users/michael/Documents/GitHub/stopwatch/stopwatch-final\</ImplementationReportsDirectory>
   <DateInitialized>2016-11-05T17:12:57</DateInitialized>
   <EnableMessageFiltering>false</EnableMessageFiltering>
  </header>

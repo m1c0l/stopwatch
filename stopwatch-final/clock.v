@@ -18,7 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module clock(clk, clk_1hz, clk_2hz, clk_fast, clk_blink, clk_1min
+module clock(clk, clk_1hz, clk_2hz, clk_fast, clk_blink, clk_1min, clk_1ms
     );
 
     reg [26:0] a100 = 0;
@@ -27,6 +27,7 @@ module clock(clk, clk_1hz, clk_2hz, clk_fast, clk_blink, clk_1min
     output reg clk_fast = 0;
     output reg clk_blink = 0;
     output reg clk_1min = 0;
+	 output reg clk_1ms = 0;
     reg [5:0] cnt_1min = 0;
 	input clk;
 
@@ -55,6 +56,9 @@ module clock(clk, clk_1hz, clk_2hz, clk_fast, clk_blink, clk_1min
         if (a100 % 'd200_000 == 0) begin
             clk_fast <= ~clk_fast;
         end
+		  if (a100 % 1000 == 0) begin
+				clk_1ms <= ~clk_1ms;
+		  end
 
     end
 
