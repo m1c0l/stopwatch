@@ -25,6 +25,7 @@ module master_control(
     input pause,
     input MISO,
 	input [2:0] SW,
+    output wire [7:0] sound_out,
     output wire SS,
     output wire MOSI,
     output wire SCLK,
@@ -55,12 +56,15 @@ module master_control(
 
     // Data read from PmodJSTK
     wire [39:0] jstkData;
+    
+    // never reset joystick
+    wire jstkRst = 0;
     //-----------------------------------------------
     //  	  			PmodJSTK Interface
     //-----------------------------------------------
     PmodJSTK PmodJSTK_Int(
             .CLK(clk),
-            .RST(rst),
+            .RST(jtskRst),
             .sndRec(sndRec),
             .DIN(sndData),
             .MISO(MISO),
@@ -75,7 +79,7 @@ module master_control(
     //-----------------------------------------------
     ClkDiv_5Hz genSndRec(
             .CLK(clk),
-            .RST(rst),
+            .RST(jstkRst),
             .CLKOUT(sndRec)
     );
     
@@ -100,7 +104,7 @@ module master_control(
 	 
 	 clock clock1(.clk(clk),
         .clk_1hz(clk_1hz), .clk_2hz(clk_2hz), .clk_fast(clk_fast),
-        .clk_blink(clk_blink), .clk_1min(clk_1min), .clk_1ms(clk_1ms));
+        .clk_blink(clk_blink), .clk_1min(clk_1min), .clk_1ms(clk_1ms), .clk_sound(clk_sound));
         
     debouncer rst_deb(.btn(rst), .clk(clk), .btn_state(rst_state));
     debouncer pause_deb(.btn(pause), .clk(clk), .btn_state(pause_state));
@@ -108,10 +112,14 @@ module master_control(
 	
 	 counter counter1(.clk(clk), .clk_1hz(clk_1hz), .clk_2hz(clk_2hz),
 		.clk_fast(clk_fast),
+        .clk_1min(clk_1min),
+        .clk_1ms(clk_1ms),
+        .clk_sound(clk_sound),
 		.rst(rst_state),
 		  .sel(sel), .adj(adj), .pause(pause_state),
           .jstkPosX(jstkPosX),
           .jstkPosY(jstkPosY),
+          .sound_out(sound_out),
 		  .minutes_top_digit(minutes_top),
 		  .minutes_bot_digit(minutes_bot),
 		  .seconds_top_digit(seconds_top),

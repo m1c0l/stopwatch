@@ -38,6 +38,10 @@ module counter_milli(
 				digit3 <= 0;
 				digit4 <= 0;
 			end
+            else if (is_fwd_or_bkwd && digit1 == 'd9 && digit2 == 'd9 && digit3 == 'd9 && digit4 == 'd9) begin
+                //blah
+            end
+            
 			else if (is_running && is_fwd_or_bkwd) begin
         // if running and counting forward
 				
@@ -64,6 +68,41 @@ module counter_milli(
 				end
 				else begin
 					digit4 <= digit4 + 1;
+				end
+				/*if (digit3 == 'd9 && digit4 == 'd9)
+					digit3 <= 0;
+					if (digit2 == 'd9) begin
+						digit2 <= 0;*/
+			end
+            
+            else if (digit1 == 'd0 && digit2 == 'd0 && digit3 == 'd0 && digit4 == 'd0) begin
+                //blah
+            end
+            
+            else if (is_running && !is_fwd_or_bkwd) begin
+                if (digit4 == 'd0) begin
+					digit4 <= 'd9;
+					if (digit3 == 'd0) begin
+						 digit3 <= 'd9;
+						 if (digit2 == 'd0) begin
+							 digit2 <= 'd9;
+							 if (digit1 == 'd0) begin
+								 digit1 <= 'd9;
+							 end
+							 else begin
+								digit1 <= digit1 - 1;
+							 end
+						 end
+						 else begin
+							digit2 <= digit2 - 1;
+						 end
+					 end
+					else begin
+						digit3 <= digit3 - 1;
+					end
+				end
+				else begin
+					digit4 <= digit4 - 1;
 				end
 				/*if (digit3 == 'd9 && digit4 == 'd9)
 					digit3 <= 0;

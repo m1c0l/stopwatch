@@ -18,16 +18,18 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module clock(clk, clk_1hz, clk_2hz, clk_fast, clk_blink, clk_1min, clk_1ms
+module clock(clk, clk_1hz, clk_2hz, clk_fast, clk_blink, clk_1min, clk_1ms, clk_sound
     );
 
     reg [26:0] a100 = 0;
+    reg [8:0] cnt_sound = 0;
     output reg clk_1hz = 0;
     output reg clk_2hz = 0;
     output reg clk_fast = 0;
     output reg clk_blink = 0;
     output reg clk_1min = 0;
 	 output reg clk_1ms = 0;
+     output reg clk_sound = 0;
     reg [5:0] cnt_1min = 0;
 	input clk;
 
@@ -56,10 +58,20 @@ module clock(clk, clk_1hz, clk_2hz, clk_fast, clk_blink, clk_1min, clk_1ms
         if (a100 % 'd200_000 == 0) begin
             clk_fast <= ~clk_fast;
         end
-		  if (a100 % 1000 == 0) begin
+		  if (a100 % 'd50_000 == 0) begin
 				clk_1ms <= ~clk_1ms;
 		  end
-
+          if (a100 % 'd113636 == 0) begin
+            clk_sound <= ~clk_sound;
+          end
+          
+          /*if (cnt_sound == 'd113636) begin
+            cnt_sound <= 0;
+            clk_sound <= ~clk_sound;
+         end
+          else begin 
+            cnt_sound <= cnt_sound + 1;
+          end*/
     end
 
 endmodule

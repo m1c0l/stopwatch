@@ -25,12 +25,14 @@ module counter(
 	 input clk_fast,
      input clk_1min,
 	  input clk_1ms,
+      input clk_sound,
     input rst,
 	 input pause,
 	 input adj,
 	 input sel,
      input [9:0] jstkPosX,
      input [9:0] jstkPosY,
+     output reg sound_out,
     output reg[3:0] minutes_top_digit,
     output reg[3:0] minutes_bot_digit,
     output reg[3:0] seconds_top_digit,
@@ -80,8 +82,8 @@ module counter(
      wire[3:0] milli_digit3;
      wire[3:0] milli_digit2;
      wire[3:0] milli_digit1;
-     counter_milli counter_milliseconds(.clk_used(hm_clk_used), .rst(rst), .sel(sel), .adj(adj),
-        .is_running(is_hours_mins), .is_fwd_or_bkwd(is_fwd_or_bkwd),
+     counter_milli counter_milliseconds(.clk_used(milli_clk_used), .rst(rst), .sel(sel), .adj(adj),
+        .is_running(is_milli), .is_fwd_or_bkwd(is_fwd_or_bkwd),
         .digit4(milli_digit4), .digit3(milli_digit3),
 		  .digit2(milli_digit2), .digit1(milli_digit1));
 		  
@@ -98,6 +100,12 @@ module counter(
 				milli_clk_used <= clk_1ms;
         end
         if (pause) begin
+            /*if (!is_running) begin
+                // about to pause, so pause all clocks
+                is_mins_secs <= 0;
+                is_hours_mins <= 0;
+                is_milli <= 0;
+            end*/
             is_running <= ~is_running;
         end
         else if (jstkPosX >= 'd800) begin
@@ -140,6 +148,7 @@ module counter(
         if (cnt_units == 0) begin
             is_mins_secs <= 0;
             is_hours_mins <= 0;
+            is_milli <= is_running;
             minutes_top_digit <= milli_digit1;
             minutes_bot_digit <= milli_digit2;
             seconds_top_digit <= milli_digit3;
@@ -147,8 +156,9 @@ module counter(
         end
         // mins/secs
         if (cnt_units == 1) begin
-            is_mins_secs <= 1;
+            is_mins_secs <= is_running;
             is_hours_mins <= 0;
+            is_milli <= 0;
             minutes_top_digit <= ms_min_top;
             minutes_bot_digit <= ms_min_bot;
             seconds_top_digit <= ms_sec_top;
@@ -157,11 +167,25 @@ module counter(
         // hours/mins
         if (cnt_units == 2) begin
             is_mins_secs <= 0;
-            is_hours_mins <= 1;
+            is_hours_mins <= is_running;
+            is_milli <= 0;
             minutes_top_digit <= hm_min_top;
             minutes_bot_digit <= hm_min_bot;
             seconds_top_digit <= hm_sec_top;
             seconds_bot_digit <= hm_sec_bot;
+        end
+        if (!is_fwd_or_bkwd && minutes_top_digit == 0 && minutes_bot_digit == 0
+            && seconds_top_digit == 0 && seconds_bot_digit == 0)
+        begin
+            if (clk_sound)
+                sound_out <= 8'b1111_1111;
+            else
+                sound_out <= 0;
+            //minutes_top_digit <= clk_sound;
+        end
+        else
+        begin
+            sound_out <= 0;
         end
       end
 
